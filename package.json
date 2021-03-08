@@ -1,0 +1,23 @@
+{
+  "name": "JavViewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OneMoreSecond/JavViewer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OneMoreSecond/JavViewer/issues"
+  },
+  "homepage": "https://github.com/OneMoreSecond/JavViewer#readme",
+  "devDependencies": {
+    "electron": "^12.0.0"
+  }
+}
