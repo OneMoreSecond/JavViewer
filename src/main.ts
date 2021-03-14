@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import fsPromises from 'fs/promises'
 
 import { Configuration } from './config'
-import { modify_dom } from './hook'
+import { dispatch_hook } from './hook'
 
 const resourceUrls = {
     javlibrary: 'http://www.javlibrary.com/cn',
@@ -25,10 +25,6 @@ async function setPacProxy(window: BrowserWindow, pacPath: string) : Promise<voi
     await window.webContents.session.setProxy({pacScript: pacScriptUrl})
 }
 
-async function execProcedure(window: BrowserWindow, procedure: () => unknown) : Promise<void> {
-    await window.webContents.executeJavaScript('(' + procedure.toString() + ')();')
-}
-
 async function createWindow(config: Configuration) : Promise<void> {
     const window = new BrowserWindow({
         webPreferences: {
@@ -43,7 +39,7 @@ async function createWindow(config: Configuration) : Promise<void> {
     window.webContents.on('did-finish-load', async () => {
         const currentURL : string = window.webContents.getURL()
         window.title = currentURL
-        execProcedure(window, modify_dom)
+        await dispatch_hook(currentURL, window.webContents.executeJavaScript)
     })
 
     await window.loadURL(resourceUrls.javlibrary)

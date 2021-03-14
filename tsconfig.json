@@ -4,7 +4,8 @@
         "outDir": "dist",
         "lib": [
             "DOM"
-        ]
+        ],
+        "sourceMap": true
     },
     "include": [
         "src/**/*"
