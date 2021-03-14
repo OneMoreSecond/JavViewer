@@ -10,14 +10,14 @@ export function initMenu(): void {
             submenu: [
                 {
                     label: 'Go forward',
-                    accelerator: 'CommandOrControl+Right',
+                    accelerator: 'Alt+Right',
                     click: (item: MenuItem, window: BrowserWindow | undefined) => {
                         window?.webContents.goForward()
                     }
                 },
                 {
                     label: 'Go back',
-                    accelerator: 'CommandOrControl+Left',
+                    accelerator: 'Alt+Left',
                     click: (item: MenuItem, window: BrowserWindow | undefined) => {
                         window?.webContents.goBack()
                     }
@@ -28,4 +28,17 @@ export function initMenu(): void {
 
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
+}
+
+export function getRightClickMenu() : Menu {
+    const template = [
+        {
+            label: 'View next',
+            click: (item: MenuItem, window: BrowserWindow | undefined) => {
+                console.log('Right click menu item triggered')
+            }
+        },
+    ]
+    const menu = Menu.buildFromTemplate(template)
+    return menu
 }
