@@ -3,6 +3,7 @@ import fsPromises from 'fs/promises'
 
 import { Configuration } from './config'
 import { dispatchHook } from './hook'
+import { initMenu } from './menu'
 
 const resourceUrls = {
     javlibrary: 'http://www.javlibrary.com/cn',
@@ -25,13 +26,14 @@ async function setPacProxy(window: BrowserWindow, pacPath: string) : Promise<voi
     await window.webContents.session.setProxy({pacScript: pacScriptUrl})
 }
 
-async function createWindow(config: Configuration) : Promise<void> {
+const config = new Configuration()
+
+async function createWindow() : Promise<void> {
     const window = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true
         }
     })
-    window.webContents.openDevTools()
 
     if (config.pacPath !== undefined) {
         setPacProxy(window, config.pacPath)
@@ -46,11 +48,10 @@ async function createWindow(config: Configuration) : Promise<void> {
     await window.loadURL(resourceUrls.javlibrary)
 }
 
-const config = new Configuration()
-
 async function initApp() : Promise<void> {
+    initMenu()
     await config.load(Configuration.getDefaultConfigPath())
-    await createWindow(config)
+    await createWindow()
 }
 
 app.whenReady().then(initApp)
@@ -63,6 +64,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-        await createWindow(config)
+        await createWindow()
     }
 })
