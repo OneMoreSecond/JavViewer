@@ -39,7 +39,7 @@ async function createWindow(config: Configuration) : Promise<void> {
     window.webContents.on('did-finish-load', async () => {
         const currentURL : string = window.webContents.getURL()
         window.title = currentURL
-        await dispatch_hook(currentURL, window.webContents.executeJavaScript)
+        await dispatch_hook(currentURL, (...args) => window.webContents.executeJavaScript(...args))
     })
 
     await window.loadURL(resourceUrls.javlibrary)

@@ -1,7 +1,7 @@
 export async function dispatch_hook(url: string, javascriptExecutor: (code: string) => Promise<unknown>) : Promise<void> {
     if (url.startsWith('http://www.javlibrary.com/cn/?v=')) {
+        console.log('[Hook][dispatch] ' + url)
         await javascriptExecutor('(' + javlibrary_modify_dom.toString() + ')();')
-        //await javascriptExecutor( javlibrary_modify_dom.toString() + ';' + javlibrary_modify_dom.name + '();')
     }
 }
 
