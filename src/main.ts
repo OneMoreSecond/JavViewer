@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import fsPromises from 'fs/promises'
 
 import { Configuration } from './config'
-import { dispatch_hook } from './hook'
+import { dispatchHook } from './hook'
 
 const resourceUrls = {
     javlibrary: 'http://www.javlibrary.com/cn',
@@ -31,6 +31,7 @@ async function createWindow(config: Configuration) : Promise<void> {
             nodeIntegration: true
         }
     })
+    window.webContents.openDevTools()
 
     if (config.pacPath !== undefined) {
         setPacProxy(window, config.pacPath)
@@ -39,7 +40,7 @@ async function createWindow(config: Configuration) : Promise<void> {
     window.webContents.on('did-finish-load', async () => {
         const currentURL : string = window.webContents.getURL()
         window.title = currentURL
-        await dispatch_hook(currentURL, (...args) => window.webContents.executeJavaScript(...args))
+        await dispatchHook(currentURL, (...args) => window.webContents.executeJavaScript(...args))
     })
 
     await window.loadURL(resourceUrls.javlibrary)

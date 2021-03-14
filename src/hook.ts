@@ -1,36 +1,58 @@
-export async function dispatch_hook(url: string, javascriptExecutor: (code: string) => Promise<unknown>) : Promise<void> {
+export async function dispatchHook(url: string, javascriptExecutor: (code: string) => Promise<unknown>) : Promise<void> {
+    const logPrefix = `[Hook][dispatchHook]`
+    function log(message: string) : void
+    {
+        console.log(logPrefix + ' ' + message)
+    }
+    async function execFunc(func: () => unknown) {
+        await javascriptExecutor('(' + func.toString() + ')();')
+    }
+
+    log(url)
+
+    if (url.startsWith('http://www.javlibrary.com')) {
+        log('remove ads')
+        await execFunc(javlibraryRemoveAds)
+    }
     if (url.startsWith('http://www.javlibrary.com/cn/?v=')) {
-        console.log('[Hook][dispatch] ' + url)
-        await javascriptExecutor('(' + javlibrary_modify_dom.toString() + ')();')
+        log('modify DOM')
+        await execFunc(javlibraryModifyDOM)
     }
 }
 
-// Since this function will executed in its string form,
-// it should be self-contained
-function javlibrary_modify_dom() : void {
+// Since following function will executed in its string form
+// they should be self-contained
+function javlibraryRemoveAds() : void {
+    for (const bannerId of ['topbanner11', 'sidebanner11', 'bottombanner12']) {
+        const bannerDiv: HTMLElement | null = document.getElementById(bannerId)
+        bannerDiv?.remove()
+    }
+}
+
+function javlibraryModifyDOM() : void {
     const DEBUG = true
-    const log_prefix = '[Hook][modify_dom]'
+    const logPrefix = `[Hook][javlibraryModifyDOM]`
 
     function logd(message: string) : void
     {
         if (DEBUG)
         {
-            console.log(log_prefix + ' ' + message)
+            console.log(logPrefix + ' ' + message)
         }
     }
 
-    function log_throw(message: string) : never
+    function logThrow(message: string) : never
     {
-        const log_message : string = log_prefix + ' ' + message
+        const log_message : string = logPrefix + ' ' + message
         console.log(log_message)
         throw new Error(log_message)
     }
 
-    const video_maker_dict = new Map([
+    const videoMakerMap = new Map([
         ['プレステージ', '118'],
     ])
 
-    const video_id_prefix_dict = new Map([
+    const videoIdPrefixMap = new Map([
         ['aby', '118'],
         ['abp', '118'],
         ['abs', '118'],
@@ -67,7 +89,7 @@ function javlibrary_modify_dom() : void {
         ['honb', 'h_1133'],
     ])
 
-    const no_zero_set = new Set([
+    const noZeroSet = new Set([
         'sqte',
         'pfes',
         'mrss',
@@ -75,87 +97,87 @@ function javlibrary_modify_dom() : void {
 
     logd('Starting running!')
 
-    function get_info(info_name: string) : {row: HTMLTableRowElement, text: string}
+    function getInfo(infoName: string) : {row: HTMLTableRowElement, text: string}
     {
-        const info_div: HTMLElement | null = document.getElementById(info_name)
-        if (info_div === null) {
-            log_throw(`div with name ${info_name} is not found`)
+        const infoDiv: HTMLElement | null = document.getElementById(infoName)
+        if (infoDiv === null) {
+            logThrow(`div with name ${infoName} is not found`)
         }
 
-        const info_rows = info_div.getElementsByTagName('tr')
-        if (info_rows.length !== 1) {
-            log_throw(`div with name ${info_name} contains ${info_rows.length} table rows (expected 1)`)
+        const infoRows = infoDiv.getElementsByTagName('tr')
+        if (infoRows.length !== 1) {
+            logThrow(`div with name ${infoName} contains ${infoRows.length} table rows (expected 1)`)
         }
-        const info_row: HTMLTableRowElement = info_rows[0]
-        if (info_row.cells.length < 2) {
-            log_throw(`div with name ${info_name} contains ${info_row.cells.length} table columns (expected >=2)`)
+        const infoRow: HTMLTableRowElement = infoRows[0]
+        if (infoRow.cells.length < 2) {
+            logThrow(`div with name ${infoName} contains ${infoRow.cells.length} table columns (expected >=2)`)
         }
-        const info_cell: HTMLElement = info_row.cells[1]
-        if (info_cell.textContent === null) {
-            log_throw(`div with name ${info_name} contains a null textContent`)
+        const infoCell: HTMLElement = infoRow.cells[1]
+        if (infoCell.textContent === null) {
+            logThrow(`div with name ${infoName} contains a null textContent`)
         }
-        const info_text = info_cell.textContent.trim()
+        const infoText = infoCell.textContent.trim()
 
-        logd(info_name + ': ' + info_text)
+        logd(infoName + ': ' + infoText)
         return {
-            row: info_row,
-            text: info_text
+            row: infoRow,
+            text: infoText
         }
     }
 
     logd('Starting getting info!')
 
-    const {text: video_maker} = get_info('video_maker')
-    const {text: video_label} = get_info('video_label')
-    const {row: video_id_row, text: video_id} = get_info('video_id')
+    const {text: videoMaker} = getInfo('video_maker')
+    const {text: videoLabel} = getInfo('video_label')
+    const {row: videoIdRow, text: videoId} = getInfo('video_id')
 
-    let video_id_prefix: string = video_id.slice(0, -4).toLowerCase()
-    if (video_maker_dict.has(video_maker))
+    let videoIdPrefix: string = videoId.slice(0, -4).toLowerCase()
+    if (videoMakerMap.has(videoMaker))
     {
-        video_id_prefix = video_maker_dict.get(video_maker) + video_id_prefix
+        videoIdPrefix = videoMakerMap.get(videoMaker) + videoIdPrefix
     }
-    else if (video_id_prefix_dict.has(video_id_prefix))
+    else if (videoIdPrefixMap.has(videoIdPrefix))
     {
-        video_id_prefix = video_id_prefix_dict.get(video_id_prefix) + video_id_prefix
+        videoIdPrefix = videoIdPrefixMap.get(videoIdPrefix) + videoIdPrefix
     }
-    else if (!no_zero_set.has(video_id_prefix))
+    else if (!noZeroSet.has(videoIdPrefix))
     {
-        video_id_prefix += '00'
+        videoIdPrefix += '00'
     }
 
-    const video_id_suffix: string = video_id.slice(-3)
-    const dmm_id: string = video_id_prefix + video_id_suffix
+    const videoIdSuffix: string = videoId.slice(-3)
+    const dmmId: string = videoIdPrefix + videoIdSuffix
     function getUrl(version: string) : string {
-        return `http://cc3001.dmm.co.jp/litevideo/freepv/${dmm_id[0]}/${dmm_id.substring(0,3)}/${dmm_id}/${dmm_id}_${version}_w.mp4`
+        return `http://cc3001.dmm.co.jp/litevideo/freepv/${dmmId[0]}/${dmmId.substring(0,3)}/${dmmId}/${dmmId}_${version}_w.mp4`
     }
 
     function addLink(text: string, url: string) : void {
-        const link_tag = document.createElement('a')
-        link_tag.href = url
-        link_tag.innerHTML = text
-        video_id_row.insertCell().appendChild(link_tag)
+        const linkTag = document.createElement('a')
+        linkTag.href = url
+        linkTag.innerHTML = text
+        videoIdRow.insertCell().appendChild(linkTag)
     }
 
     logd('Starting adding links!')
 
-    const right_column_div = document.getElementById('rightcolumn')
-    if (right_column_div === null) {
-        log_throw(`div with name rightcolumn not found`)
+    const rightColumnDiv = document.getElementById('rightcolumn')
+    if (rightColumnDiv === null) {
+        logThrow(`div with name rightcolumn not found`)
     }
 
-    const insert_place = document.getElementById('video_jacket_info')
-    if (insert_place === undefined || !(insert_place instanceof HTMLTableElement)) {
-        log_throw(`the table with name video_jacket_info is not found`)
+    const insertPlace = document.getElementById('video_jacket_info')
+    if (insertPlace === undefined || !(insertPlace instanceof HTMLTableElement)) {
+        logThrow(`the table with name video_jacket_info is not found`)
     }
 
-    let is_video_inserted = false
+    let isVideoInserted = false
 
     for (const version of ['mhb', 'dmb', 'dm', 'sm'])
     {
         const url: string = getUrl(version)
         addLink(version, url)
 
-        if (is_video_inserted)
+        if (isVideoInserted)
         {
             continue
         }
@@ -165,28 +187,28 @@ function javlibrary_modify_dom() : void {
         http.send()
         if (http.status < 400)
         {
-            const video_tag = document.createElement('video')
-            video_tag.src = url
-            video_tag.controls = true
+            const videoTag = document.createElement('video')
+            videoTag.src = url
+            videoTag.controls = true
 
-            const preview_row = insert_place.insertRow()
-            preview_row.insertCell().appendChild(video_tag)
+            const previewRow = insertPlace.insertRow()
+            previewRow.insertCell().appendChild(videoTag)
 
-            const preview_thumbs = document.getElementsByClassName('previewthumbs')[0]
-            if (preview_thumbs !== undefined)
+            const previewThumbs = document.getElementsByClassName('previewthumbs')[0]
+            if (previewThumbs !== undefined)
             {
-                right_column_div.removeChild(preview_thumbs)
-                preview_row.insertCell().appendChild(preview_thumbs)
+                rightColumnDiv.removeChild(previewThumbs)
+                previewRow.insertCell().appendChild(previewThumbs)
             }
 
-            is_video_inserted = true
+            isVideoInserted = true
             addLink('√', '')
 
             logd('successful version: ' + version)
         }
     }
 
-    if (!is_video_inserted)
+    if (!isVideoInserted)
     {
         addLink('×', '')
     }
