@@ -10,12 +10,14 @@ export function initMenu(): void {
             submenu: [
                 {
                     label: 'Go forward',
+                    accelerator: 'CommandOrControl+Right',
                     click: (item: MenuItem, window: BrowserWindow | undefined) => {
                         window?.webContents.goForward()
                     }
                 },
                 {
                     label: 'Go back',
+                    accelerator: 'CommandOrControl+Left',
                     click: (item: MenuItem, window: BrowserWindow | undefined) => {
                         window?.webContents.goBack()
                     }
