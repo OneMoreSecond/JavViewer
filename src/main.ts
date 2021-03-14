@@ -39,9 +39,8 @@ async function createWindow() : Promise<void> {
         setPacProxy(window, config.pacPath)
     }
 
-    window.webContents.on('did-finish-load', async () => {
+    window.webContents.on('dom-ready', async () => {
         const currentURL : string = window.webContents.getURL()
-        window.title = currentURL
         await dispatchHook(currentURL, (...args) => window.webContents.executeJavaScript(...args))
     })
 

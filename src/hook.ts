@@ -23,7 +23,7 @@ export async function dispatchHook(url: string, javascriptExecutor: (code: strin
 // Since following function will executed in its string form
 // they should be self-contained
 function javlibraryRemoveAds() : void {
-    for (const bannerId of ['topbanner11', 'sidebanner11', 'bottombanner12']) {
+    for (const bannerId of ['topbanner11', 'sidebanner11', 'middlebanner11', 'bottombanner12']) {
         const bannerDiv: HTMLElement | null = document.getElementById(bannerId)
         bannerDiv?.remove()
     }
@@ -160,11 +160,6 @@ function javlibraryModifyDOM() : void {
 
     logd('Starting adding links!')
 
-    const rightColumnDiv = document.getElementById('rightcolumn')
-    if (rightColumnDiv === null) {
-        logThrow(`div with name rightcolumn not found`)
-    }
-
     const insertPlace = document.getElementById('video_jacket_info')
     if (insertPlace === undefined || !(insertPlace instanceof HTMLTableElement)) {
         logThrow(`the table with name video_jacket_info is not found`)
@@ -197,7 +192,7 @@ function javlibraryModifyDOM() : void {
             const previewThumbs = document.getElementsByClassName('previewthumbs')[0]
             if (previewThumbs !== undefined)
             {
-                rightColumnDiv.removeChild(previewThumbs)
+                previewThumbs.remove()
                 previewRow.insertCell().appendChild(previewThumbs)
             }
 
